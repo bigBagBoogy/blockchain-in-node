@@ -4,8 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsc -w"
+    "dev": "tsc -w",
+    "start": "node src/index.js" 
   },
+  "dependencies": {
+    "crypto-js": "^4.0.0"   
+  },
+  
   "keywords": [],
   "author": "",
   "license": "ISC",
