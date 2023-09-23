@@ -12,13 +12,7 @@ git push -u origin main
 
 git rm -r --cached node_modules
 
-# Read often!
-
-"ok, thank you. I have no clue what "Props and State" means though."
-
-# ChatGPT:
-
-No problem! Let me explain "Props" and "State" in the context of React, as they are fundamental concepts when building React applications.
+# React:
 
 Props (Properties):
 
