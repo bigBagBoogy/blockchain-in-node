@@ -66,14 +66,14 @@ class Wallet {
   }
   
   // Example usage:
-  const alice = new Wallet();
-  const bob = new Wallet();
+  // const alice = new Wallet();
+  // const bob = new Wallet();
   
-  alice.balance = 100; // Set Alice's balance to 100 for testing
+  // alice.balance = 100; // Set Alice's balance to 100 for testing
   
-  alice.sendFunds(bob, 50); // Alice sends 50 to Bob
-  console.log(`Alice's balance: ${alice.balance}`);
-  console.log(`Bob's balance: ${bob.balance}`);
+  // alice.sendFunds(bob, 50); // Alice sends 50 to Bob
+  // console.log(`Alice's balance: ${alice.balance}`);
+  // console.log(`Bob's balance: ${bob.balance}`);
   
 
 // Function to validate a transaction
@@ -94,6 +94,13 @@ function getSenderBalance(sender: string): number {
       return 0; // Return 0 balance for unknown sender
     }
   }
+  const pendingTransactions: Transaction[] = []; // This array stores pending transactions
+
+function addToPendingTransactions(transaction: Transaction) {
+  pendingTransactions.push(transaction);
+  console.log(`Transaction ${transaction} added to the pending pool.`);
+}
+
   
   // Example usage:
   const senderAddress = '0xAddress2';

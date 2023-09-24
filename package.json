@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+
   "scripts": {
-    "dev": "tsc -w",
-    "start": "node src/index.js" 
+    "dev": "ts-node src/index.ts",
+    "start": "ts-node src/index.ts"
   },
+  
   "dependencies": {
     "crypto-js": "^4.0.0"   
   },
