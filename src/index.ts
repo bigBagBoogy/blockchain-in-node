@@ -27,7 +27,7 @@ class Block {
 
 }
 class Chain {
-    public static instance = new Chain();
+    public static instance = new Chain();   //class Chain { ... } defines a class named Chain. This class likely represents a blockchain or blockchain-related functionality.  public static instance = new Chain(); is a class property declaration. Here's what it means:   public: This keyword specifies the visibility of the property. In this context, public means that the property can be accessed and modified from outside the class.   static: This keyword indicates that the property is associated with the class itself rather than with instances of the class. In other words, you can access it as Chain.instance without needing to create an instance of the Chain class.    instance: This is the name of the property. It's named instance, but you could choose any valid variable name.    = new Chain();: This part of the code initializes the instance property with a new instance of the Chain class. It essentially creates a singleton pattern, where there is only one instance of the Chain class throughout the application. This is often used for scenarios where you want a single point of access to a particular resource, like a blockchain.    By declaring instance as a public static property and initializing it with a new instance of Chain, you ensure that you can access the blockchain instance from anywhere in your codebase using Chain.instance.       This pattern is common in both TypeScript and JavaScript when you want to create a singleton or provide a central point of access to a particular resource or service. It allows you to maintain a single instance of an object throughout your application, ensuring consistency and simplifying access to that object.
 
     chain: Block[];
 
