@@ -1,9 +1,10 @@
 import * as crypto from 'crypto';
+import { handleUserInput } from './userInput';
 
 
 
 
-class Transaction {
+export class Transaction {
     constructor(public from: string, public to: string, public amount: number) {
         
     }
@@ -37,21 +38,38 @@ class Chain {
     getLastBlock() {
         return this.chain[this.chain.length - 1];
     }
-    mine(nonce: number) {
-    let solution = 1;
-    console.log('⛏️  mining...')
+    mine(block: Block, difficulty: number, pendingTransaction: Transaction) {
+        let solution = 1;
+        console.log('⛏️  mining...')
+    
+        const mineBlock = () => {
+            const hash = crypto.createHash('MD5');
+            hash.update((block.nonce + solution).toString()).end();
+    
+            const attempt = hash.digest('hex');
+    
+            if (attempt.substring(0, difficulty) === '0'.repeat(difficulty)) {
+                console.log(`Solved: ${solution}`)
+                
+                // Create a new block with the pending transaction
+                const newBlock = new Block(block.hash, pendingTransaction);
+                
+                // Add the new block to the blockchain
+                this.chain.push(newBlock);
+            } else {
+                // If not solved, continue mining with a delay
+                setTimeout(mineBlock, 1000); // Adjust the delay as needed
+            }
+        };
+    
+        mineBlock(); // Start mining
+    }
+    
 
-    while (true) {
-        const hash = crypto.createHash('MD5');
-        hash.update((nonce + solution).toString()).end();
 
-        const attempt = hash.digest('hex');
+    
+    
 
-        if (attempt.substring(0, 4) === '0000') {
-            console.log(`Solved: ${solution}`)
-            return solution;
-        }
-    }}
 
     addBlock(transaction: Transaction, senderPublicKey: string, signature: Buffer) {
         const verifier = crypto.createVerify('SHA256');
@@ -98,12 +116,30 @@ sendMoney(amount: number, payeePublicKey: string) {
 
 
 }
-const satoshi = new Wallet();
-const bob = new Wallet();
-const alice = new Wallet();
+// Function to periodically mine new blocks and clear transactions
+function mineAndConfirm(blockchain: Chain, pendingTransaction: Transaction) {
+    const difficulty = 4; // Set the desired difficulty level
+    const currentBlock = blockchain.getLastBlock(); // Get the current block
+    blockchain.mine(currentBlock, difficulty, pendingTransaction); // Mine a new block with the pending transaction
+    
+    // Clear confirmed transactions from the pending pool (if you have such a function)
+    // clearConfirmedTransactions(newBlock);
+}
 
-satoshi.sendMoney(50, bob.publicKey);
-bob.sendMoney(23, alice.publicKey);
-alice.sendMoney(5, bob.publicKey);
 
-console.log(Chain.instance);
+(async () => {
+  while (true) {
+    try {
+      await handleUserInput((transaction) => {
+        // Access the amount from the transaction object
+        const amount = transaction.amount;
+
+        // Periodically mine new blocks and confirm transactions
+        mineAndConfirm(Chain.instance, new Transaction('', '', amount));
+      });
+    } catch (error) {
+      // Handle errors from user input
+      console.error(error);
+    }
+  }
+})();

@@ -3,7 +3,7 @@
 git init
 git branch -M main
 git add .
-git commit -m "added comments"
+git commit -m "amended code"
 git push -u origin main
 
 # remove: (for example node_modules)!
