@@ -1,39 +1,6 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const crypto = __importStar(require("crypto"));
-class Transaction {
-    constructor(from, to, amount) {
-        this.from = from;
-        this.to = to;
-        this.amount = amount;
-    }
-    toString() {
-        return JSON.stringify(this);
-    }
-}
+import * as crypto from 'crypto';
+import { handleUserInput } from './userInput';
+import { Transaction } from './transaction';
 class Block {
     constructor(prevHash, transaction, ts = Date.now()) {
         this.prevHash = prevHash;
@@ -55,16 +22,19 @@ class Chain {
     getLastBlock() {
         return this.chain[this.chain.length - 1];
     }
-    mine(nonce) {
+    mine(block, difficulty, pendingTransaction) {
         let solution = 1;
         console.log('⛏️  mining...');
         const mineBlock = () => {
             const hash = crypto.createHash('MD5');
-            hash.update((nonce + solution).toString()).end();
+            hash.update((block.nonce + solution).toString()).end();
             const attempt = hash.digest('hex');
-            if (attempt.substring(0, 4) === '0000') {
+            if (attempt.substring(0, difficulty) === '0'.repeat(difficulty)) {
                 console.log(`Solved: ${solution}`);
-                return solution;
+                // Create a new block with the pending transaction
+                const newBlock = new Block(block.hash, pendingTransaction);
+                // Add the new block to the blockchain
+                this.chain.push(newBlock);
             }
             else {
                 // If not solved, continue mining with a delay
@@ -108,10 +78,34 @@ class Wallet {
         Chain.instance.addBlock(transaction, this.publicKey, signature);
     }
 }
-const satoshi = new Wallet();
-const bob = new Wallet();
-const alice = new Wallet();
-satoshi.sendMoney(50, bob.publicKey);
-bob.sendMoney(23, alice.publicKey);
-alice.sendMoney(5, bob.publicKey);
-console.log(Chain.instance);
+// Function to periodically mine new blocks and clear transactions
+function mineAndConfirm(blockchain, pendingTransaction) {
+    const difficulty = 4; // Set the desired difficulty level
+    const currentBlock = blockchain.getLastBlock(); // Get the current block
+    blockchain.mine(currentBlock, difficulty, pendingTransaction); // Mine a new block with the pending transaction
+    // Clear confirmed transactions from the pending pool (if you have such a function)
+    // clearConfirmedTransactions(newBlock);
+}
+// Define processUserInput function outside of the IIFE
+async function processUserInput(sender, recipient, amount) {
+    await handleUserInput(sender, recipient, amount, (transaction) => {
+        // Access the amount from the transaction object
+        const amount = transaction.amount;
+        // Periodically mine new blocks and confirm transactions
+        mineAndConfirm(Chain.instance, new Transaction('', '', amount));
+    });
+}
+(async () => {
+    while (true) {
+        try {
+            // Call processUserInput with appropriate values
+            await processUserInput('sender_address', 'recipient_address', 10); // Replace with actual values
+            // Add a delay (e.g., 1 second) before the next iteration
+            await new Promise((resolve) => setTimeout(resolve, 1000)); // Adjust the delay duration as needed
+        }
+        catch (error) {
+            // Handle errors from user input
+            console.error(error);
+        }
+    }
+})();

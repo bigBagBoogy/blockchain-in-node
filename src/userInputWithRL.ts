@@ -1,8 +1,7 @@
 // userInput.ts
 
-import { Transaction } from './transaction.js'; // Update the import path
-
-
+import readline from 'readline';
+import { Transaction } from './transaction'; // Update the import path
 
 const balances: { [address: string]: number } = {};
 
@@ -12,27 +11,31 @@ balances['0xAddress2'] = 50;
 balances['0xAddress3'] = 200;
 
 
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
 
-export async function handleUserInput(
-  sender: string,
-  recipient: string,
-  amount: number,
-  callback: (transaction: Transaction) => void
-) {
-  const newTransaction = new Transaction(sender, recipient, amount);
+export function handleUserInput(callback: (transaction: Transaction) => void) {
+  rl.question('Sender: ', (sender) => {
+    rl.question('Recipient: ', (recipient) => {
+      rl.question('Amount: ', (amount) => {
+        const newTransaction = new Transaction(sender, recipient, parseFloat(amount));
 
-  // Validate and add the transaction to the pending pool
-  if (isValidTransaction(newTransaction, sender)) {
-    addToPendingTransactions(newTransaction);
-    console.log('Transaction added to the pending pool.');
-    callback(newTransaction);
-  } else {
-    // console.log('Invalid transaction. Rejected.');
-    return;
-  }
+        // Validate and add the transaction to the pending pool
+        if (isValidTransaction(newTransaction, sender)) {
+          addToPendingTransactions(newTransaction);
+          console.log('Transaction added to the pending pool.');
+          callback(newTransaction);
+        } else {
+          console.log('Invalid transaction. Rejected.');
+        }
+
+        rl.close();
+      });
+    });
+  });
 }
-
-   
 class Wallet {
     public address: string;
     public balance: number;
@@ -84,7 +87,7 @@ function isValidTransaction(transaction: Transaction, sender: string): boolean {
 
   
   // Get the balance of a sender
-export function getSenderBalance(sender: string): number {
+function getSenderBalance(sender: string): number {
     if (balances.hasOwnProperty(sender)) {
       return balances[sender];
     } else {

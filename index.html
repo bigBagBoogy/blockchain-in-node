@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blockchain User Interface</title>
+  </head>
+  <body>
+    <h1>Blockchain User Interface</h1>
+    <div>
+      <p id="0xAddress1">balanceOf: 0xAddress1</p>
+      <p id="0xAddress2">balanceOf: 0xAddress2</p>
+      <p id="0xAddress3">balanceOf: 0xAddress3</p>
+    </div>
+
+    <div>
+      <label for="sender">Sender:</label>
+      <input type="text" id="sender" />
+    </div>
+
+    <div>
+      <label for="recipient">Recipient:</label>
+      <input type="text" id="recipient" />
+    </div>
+
+    <div>
+      <label for="amount">Amount:</label>
+      <input type="number" id="amount" />
+    </div>
+
+    <button id="submitTransaction">Submit Transaction</button>
+
+    <div id="transactionResult"></div>
+
+    <script type="module" src="src/script.js"></script>
+  </body>
+</html>

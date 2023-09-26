@@ -1,18 +1,8 @@
 import * as crypto from 'crypto';
 import { handleUserInput } from './userInput';
+import { Transaction } from './transaction';
 
 
-
-
-export class Transaction {
-    constructor(public from: string, public to: string, public amount: number) {
-        
-    }
-    toString() {
-        return JSON.stringify(this);
-    }
-
-}
 class Block {
 
     public nonce = Math.round(Math.random() * 999999999);
@@ -127,19 +117,30 @@ function mineAndConfirm(blockchain: Chain, pendingTransaction: Transaction) {
 }
 
 
-(async () => {
-  while (true) {
-    try {
-      await handleUserInput((transaction) => {
-        // Access the amount from the transaction object
-        const amount = transaction.amount;
-
-        // Periodically mine new blocks and confirm transactions
-        mineAndConfirm(Chain.instance, new Transaction('', '', amount));
-      });
-    } catch (error) {
-      // Handle errors from user input
-      console.error(error);
-    }
+// Define processUserInput function outside of the IIFE
+async function processUserInput(sender: string, recipient: string, amount: number) {
+    await handleUserInput(sender, recipient, amount, (transaction) => {
+      // Access the amount from the transaction object
+      const amount = transaction.amount;
+  
+      // Periodically mine new blocks and confirm transactions
+      mineAndConfirm(Chain.instance, new Transaction('', '', amount));
+    });
   }
-})();
+  
+  (async () => {
+    while (true) {
+      try {
+        // Call processUserInput with appropriate values
+        await processUserInput('sender_address', 'recipient_address', 10); // Replace with actual values
+  
+        // Add a delay (e.g., 1 second) before the next iteration
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Adjust the delay duration as needed
+      } catch (error) {
+        // Handle errors from user input
+        console.error(error);
+      }
+    }
+  })();
+  
+  
